@@ -50,8 +50,8 @@ export function Dashboard() {
           <StatsWidget tasks={tasks} focusSessions={focusSessions} />
         </motion.div>
 
-        {/* Focus Shortcut Widget - Spans 6 columns on medium, 4 on large */}
-        <motion.div variants={itemVariants} className="col-span-1 md:col-span-6 lg:col-span-4 row-span-1">
+        {/* Focus Shortcut Widget - Spans 6 columns on medium, 5 on large */}
+        <motion.div variants={itemVariants} className="col-span-1 md:col-span-6 lg:col-span-7 row-span-1">
           <FocusShortcutWidget />
         </motion.div>
 

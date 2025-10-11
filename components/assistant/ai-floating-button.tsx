@@ -30,26 +30,37 @@ export function AIFloatingButton() {
     if (!message.trim()) return
 
     const convId = getOrCreateConversation()
+    const conversation = aiConversations.find((c) => c.id === convId)
 
     // Add user message
     addMessage(message, "user")
+    const userMessage = message
     setMessage("")
-
-    // Simulate AI response
     setIsLoading(true)
 
     try {
-      // In a real implementation, this would call the AI API
-      // For now, we'll simulate a response after fetching context
-      const contextResponse = await fetch("/api/user/context")
+      const history = conversation?.messages.slice(-10) || []
+      const response = await fetch("/api/ask-ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          history,
+        }),
+      })
 
-      // Simulate AI thinking time
-      setTimeout(() => {
-        addMessage("I'm analyzing your data to provide a helpful response...", "assistant")
-        setIsLoading(false)
-      }, 1500)
+      if (!response.ok) {
+        throw new Error("Failed to get AI response")
+      }
+
+      const data = await response.json()
+      addMessage(data.content, "assistant")
     } catch (error) {
       console.error("Error sending message:", error)
+      addMessage("Sorry, I couldn't get a response. Please try again.", "assistant")
+    } finally {
       setIsLoading(false)
     }
   }

@@ -8,8 +8,10 @@ import { Send, Bot, Sparkles, Plus, Trash2 } from "lucide-react"
 import { useStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { MarkdownPreview } from "@/components/notes/markdown-preview"
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -103,6 +105,142 @@ export function AIAssistant() {
 
   // Add state for delete confirmation dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  
+  // Add state for showing suggested prompts
+  const [showSuggestedPrompts, setShowSuggestedPrompts] = useState(false)
+  
+  // Add state for topic input and AI-generated suggestions
+  const [topicInput, setTopicInput] = useState("")
+  const [aiGeneratedPrompts, setAiGeneratedPrompts] = useState<string[]>([])
+  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false)
+  
+  // Generate AI suggestions based on topic input
+  const generateAISuggestions = async () => {
+    if (!topicInput.trim()) return
+    
+    setIsGeneratingPrompts(true)
+    try {
+      const response = await fetch("/api/ask-ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `Generate 8 specific study prompts for the topic: "${topicInput}". Make them educational and focused on learning, understanding, and applying knowledge about this topic. Return only the prompts, one per line, without numbering or bullet points.`,
+          history: [],
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to generate suggestions")
+      }
+
+      const data = await response.json()
+      const prompts = data.content
+        .split('\n')
+        .filter((line: string) => line.trim())
+        .slice(0, 8) // Limit to 8 prompts
+      
+      setAiGeneratedPrompts(prompts)
+    } catch (error) {
+      console.error("Error generating AI suggestions:", error)
+      // Fallback to default prompts
+      setAiGeneratedPrompts(getDynamicPrompts())
+    } finally {
+      setIsGeneratingPrompts(false)
+    }
+  }
+  
+  // Generate dynamic prompts based on conversation context
+  const getDynamicPrompts = () => {
+    if (!conversation?.messages.length) {
+      // Default prompts when no conversation exists
+      return [
+        "Explain the concept of derivatives in calculus",
+        "Create a study plan for my upcoming exam",
+        "Summarize my notes on World War II",
+        "Help me understand sorting algorithms",
+        "Generate flashcards from my notes",
+        "Explain this topic in simple terms",
+        "What are the key points I should remember?",
+        "Help me prepare for my presentation",
+      ]
+    }
+
+    // Get the last few messages to understand the topic
+    const recentMessages = conversation.messages.slice(-3)
+    const conversationText = recentMessages.map(msg => msg.content).join(' ').toLowerCase()
+    
+    // Topic-specific prompts based on conversation content
+    if (conversationText.includes('calculus') || conversationText.includes('derivative') || conversationText.includes('integral')) {
+      return [
+        "Explain the concept of derivatives in calculus",
+        "Help me understand integration techniques",
+        "What are the applications of calculus in real life?",
+        "Explain the chain rule with examples",
+        "Help me solve this calculus problem step by step",
+        "What are the fundamental theorems of calculus?",
+        "Explain limits and continuity",
+        "Help me understand differential equations",
+      ]
+    } else if (conversationText.includes('history') || conversationText.includes('war') || conversationText.includes('historical')) {
+      return [
+        "Summarize the key events of World War II",
+        "Explain the causes of the American Revolution",
+        "What were the major civilizations of ancient times?",
+        "Help me understand the timeline of events",
+        "What were the social impacts of this historical period?",
+        "Explain the significance of this historical event",
+        "Help me analyze primary sources",
+        "What were the long-term consequences?",
+      ]
+    } else if (conversationText.includes('algorithm') || conversationText.includes('programming') || conversationText.includes('code')) {
+      return [
+        "Help me understand sorting algorithms",
+        "Explain the time complexity of this algorithm",
+        "What are the different data structures?",
+        "Help me debug this code",
+        "Explain object-oriented programming concepts",
+        "What are the best practices for this programming language?",
+        "Help me optimize this algorithm",
+        "Explain recursion with examples",
+      ]
+    } else if (conversationText.includes('biology') || conversationText.includes('cell') || conversationText.includes('organism')) {
+      return [
+        "Explain the structure and function of cells",
+        "Help me understand the process of photosynthesis",
+        "What are the different systems in the human body?",
+        "Explain the process of evolution",
+        "Help me understand genetics and DNA",
+        "What are the different types of ecosystems?",
+        "Explain the process of cellular respiration",
+        "Help me understand the classification of organisms",
+      ]
+    } else if (conversationText.includes('physics') || conversationText.includes('force') || conversationText.includes('energy')) {
+      return [
+        "Explain Newton's laws of motion",
+        "Help me understand the concept of energy",
+        "What are the different types of forces?",
+        "Explain the principles of thermodynamics",
+        "Help me solve this physics problem",
+        "What are the properties of waves?",
+        "Explain the concept of momentum",
+        "Help me understand electricity and magnetism",
+      ]
+    } else {
+      // General prompts for any topic
+      return [
+        "Explain this concept in simple terms",
+        "What are the key points I should remember?",
+        "Help me understand this topic step by step",
+        "Create a summary of the main ideas",
+        "What are the practical applications?",
+        "Help me prepare for my exam on this topic",
+        "Explain the connections between different concepts",
+        "What are common misconceptions about this subject?",
+      ]
+    }
+  }
 
   // Update the deleteCurrentConversation function to use the new store methods
   const deleteCurrentConversation = () => {
@@ -154,20 +292,32 @@ export function AIAssistant() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
-                  "p-2 rounded-lg cursor-pointer",
+                  "p-2 rounded-lg cursor-pointer group relative",
                   currentConversation === conv.id ? "bg-primary/20" : "hover:bg-card/50",
                 )}
                 onClick={() => setCurrentConversation(conv.id)}
               >
-                <div className="flex items-center">
+                <div className="flex items-center pr-6">
                   <Bot className="h-4 w-4 mr-2" />
                   <span className="text-sm font-medium truncate">{conv.title}</span>
                 </div>
-                <p className="text-xs text-muted-foreground truncate mt-1">
+                <p className="text-xs text-muted-foreground truncate mt-1 pr-6">
                   {conv.messages.length > 0
                     ? conv.messages[conv.messages.length - 1].content.substring(0, 30) + "..."
                     : "No messages yet"}
                 </p>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    deleteConversation(conv.id)
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span className="sr-only">Delete conversation</span>
+                </Button>
               </motion.div>
             ))}
           </div>
@@ -192,7 +342,7 @@ export function AIAssistant() {
               <Trash2 className="h-4 w-4 mr-1" />
               Delete Chat
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => setShowSuggestedPrompts(true)}>
               <Sparkles className="h-4 w-4 mr-1" />
               Suggest Prompts
             </Button>
@@ -213,7 +363,11 @@ export function AIAssistant() {
                       msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-card",
                     )}
                   >
-                    <p>{msg.content}</p>
+                    {msg.role === "assistant" ? (
+                      <MarkdownPreview content={msg.content} />
+                    ) : (
+                      <p>{msg.content}</p>
+                    )}
                     <p className="text-xs opacity-70 mt-1 text-right">{formatTimestamp(msg.timestamp)}</p>
                   </motion.div>
                 </div>
@@ -258,7 +412,7 @@ export function AIAssistant() {
                 concepts, create study plans, and more.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 w-full max-w-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
                 {[
                   "Explain the concept of derivatives in calculus",
                   "Create a study plan for my upcoming exam",
@@ -268,13 +422,13 @@ export function AIAssistant() {
                   <Button
                     key={index}
                     variant="outline"
-                    className="justify-start h-auto py-2 px-3"
+                    className="justify-start h-auto min-h-[60px] py-3 px-4 text-left whitespace-normal break-words"
                     onClick={() => {
                       setMessage(prompt)
                       setTimeout(() => sendMessage(), 100)
                     }}
                   >
-                    <span className="text-sm text-left">{prompt}</span>
+                    <span className="text-sm leading-relaxed">{prompt}</span>
                   </Button>
                 ))}
               </div>
@@ -321,6 +475,73 @@ export function AIAssistant() {
             >
               Delete
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Suggested prompts dialog */}
+      <AlertDialog open={showSuggestedPrompts} onOpenChange={(open) => setShowSuggestedPrompts(open)}>
+        <AlertDialogContent className="max-w-4xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Suggested Prompts</AlertDialogTitle>
+            <AlertDialogDescription>
+              Get personalized prompts based on your topic or choose from conversation-based suggestions:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          {/* Topic Input Section */}
+          <div className="space-y-4 my-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter a topic (e.g., 'machine learning', 'world history', 'organic chemistry')"
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    generateAISuggestions()
+                  }
+                }}
+                className="flex-1"
+              />
+              <Button 
+                onClick={generateAISuggestions}
+                disabled={!topicInput.trim() || isGeneratingPrompts}
+                className="px-6"
+              >
+                {isGeneratingPrompts ? "Generating..." : "Generate"}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Prompts Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-4">
+            {(aiGeneratedPrompts.length > 0 ? aiGeneratedPrompts : getDynamicPrompts()).map((prompt, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="justify-start h-auto min-h-[60px] py-3 px-4 text-left whitespace-normal break-words"
+                onClick={() => {
+                  setMessage(prompt)
+                  setShowSuggestedPrompts(false)
+                  setTimeout(() => sendMessage(), 100)
+                }}
+              >
+                <span className="text-sm leading-relaxed">{prompt}</span>
+              </Button>
+            ))}
+          </div>
+          
+          <AlertDialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setTopicInput("")
+                setAiGeneratedPrompts([])
+              }}
+            >
+              Clear
+            </Button>
+            <AlertDialogCancel>Close</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
