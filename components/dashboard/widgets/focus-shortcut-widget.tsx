@@ -15,7 +15,7 @@ export function FocusShortcutWidget() {
   // Start a quick focus session
   const handleQuickStart = () => {
     startFocusSession()
-    window.location.href = "/focus"
+    window.location.href = "/dashboard/focus"
   }
 
   return (
@@ -42,7 +42,7 @@ export function FocusShortcutWidget() {
               <h3 className="text-lg font-medium mb-1">Focus Session Active</h3>
               {currentTask && <p className="text-sm text-muted-foreground mb-3">Working on: {currentTask.title}</p>}
               <Button asChild className="w-full">
-                <Link href="/focus">
+                <Link href="/dashboard/focus">
                   <CheckCircle2 className="h-4 w-4 mr-2" />
                   Continue Session
                 </Link>
@@ -67,7 +67,7 @@ export function FocusShortcutWidget() {
                 </Button>
 
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/focus">
+                  <Link href="/dashboard/focus">
                     <Music className="h-4 w-4 mr-2" />
                     With Music
                   </Link>

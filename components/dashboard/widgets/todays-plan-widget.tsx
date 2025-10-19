@@ -99,11 +99,11 @@ export function TodaysPlanWidget({ tasks }: TodaysPlanWidgetProps) {
 
         <div className="flex justify-between mt-3">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/planner">View Planner</Link>
+            <Link href="/dashboard/planner">View Planner</Link>
           </Button>
 
           <Button size="sm" asChild>
-            <Link href="/focus">
+            <Link href="/dashboard/focus">
               <Clock className="h-4 w-4 mr-1" />
               Start Focus Session
             </Link>

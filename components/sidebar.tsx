@@ -44,12 +44,12 @@ export function Sidebar() {
 
   // Navigation items
   const navItems = [
-    { href: "/", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/planner", label: "Planner", icon: Calendar },
-    { href: "/courses", label: "Courses", icon: BookOpen },
-    { href: "/focus", label: "Focus Mode", icon: Clock },
-    { href: "/notes", label: "Notes", icon: FileText },
-    { href: "/assistant", label: "AI Assistant", icon: Bot },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/planner", label: "Planner", icon: Calendar },
+    { href: "/dashboard/courses", label: "Courses", icon: BookOpen },
+    { href: "/dashboard/focus", label: "Focus Mode", icon: Clock },
+    { href: "/dashboard/notes", label: "Notes", icon: FileText },
+    { href: "/dashboard/assistant", label: "AI Assistant", icon: Bot },
   ]
 
   // Sidebar variants for animation
@@ -130,9 +130,9 @@ export function Sidebar() {
       <div className="flex flex-col h-full p-4">
         <div className="flex items-center justify-between mb-8">
           {sidebarOpen ? (
-            <h1 className="text-xl font-bold text-primary">StudySync</h1>
+            <h1 className="text-xl font-bold text-primary">ACED</h1>
           ) : (
-            <span className="text-xl font-bold text-primary">SS</span>
+            <span className="text-xl font-bold text-primary"></span>
           )}
 
           <Button variant="ghost" size="icon" onClick={toggleSidebar}>

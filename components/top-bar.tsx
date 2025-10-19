@@ -181,7 +181,7 @@ export function TopBar() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="absolute right-0 mt-2 w-80 z-[9999]"
+                className="absolute right-0 mt-2 w-80 z-100"
               >
                 <div className="glassmorphism-high-z rounded-xl overflow-hidden shadow-lg">
                   <div className="flex items-center justify-between p-3 border-b border-border/50">
@@ -254,7 +254,7 @@ export function TopBar() {
                   {notifications.length > 0 && (
                     <div className="p-3 border-t border-border/50">
                       <Button variant="outline" size="sm" className="w-full" asChild>
-                        <Link href="/planner" onClick={() => setShowNotifications(false)}>
+                        <Link href="/dashboard/planner" onClick={() => setShowNotifications(false)}>
                           View All
                         </Link>
                       </Button>

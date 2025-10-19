@@ -19,7 +19,7 @@ export function CoursesWidget({ courses }: CoursesWidgetProps) {
       <div className="widget-header">
         <h2 className="widget-title">My Courses</h2>
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/courses">
+          <Link href="/dashboard/courses">
             <span className="mr-1">View All</span>
             <ChevronRight className="h-4 w-4" />
           </Link>
@@ -46,7 +46,7 @@ export function CoursesWidget({ courses }: CoursesWidgetProps) {
                 key={course.id}
                 whileHover={{ scale: 1.02 }}
                 className="glassmorphism rounded-xl overflow-hidden cursor-pointer glow-hover"
-                onClick={() => (window.location.href = "/courses")}
+                onClick={() => (window.location.href = "/dashboard/courses")}
               >
                 <div className="relative h-24 overflow-hidden">
                   <img src={thumbnail || "/placeholder.svg"} alt={course.name} className="w-full h-full object-cover" />
@@ -82,7 +82,7 @@ export function CoursesWidget({ courses }: CoursesWidgetProps) {
               <h3 className="font-medium mb-1 text-sm">No courses yet</h3>
               <p className="text-xs text-muted-foreground mb-3">Add your first course to get started</p>
               <Button size="sm" asChild>
-                <Link href="/courses">
+                <Link href="/dashboard/courses">
                   <Plus className="h-3 w-3 mr-1" />
                   <span>Add Course</span>
                 </Link>
@@ -95,7 +95,7 @@ export function CoursesWidget({ courses }: CoursesWidgetProps) {
             <motion.div
               whileHover={{ scale: 1.02 }}
               className="glassmorphism rounded-xl overflow-hidden cursor-pointer border-dashed border-2 border-border flex items-center justify-center"
-              onClick={() => (window.location.href = "/courses")}
+              onClick={() => (window.location.href = "/dashboard/courses")}
             >
               <div className="flex flex-col items-center justify-center p-6 text-center">
                 <div className="h-12 w-12 rounded-full bg-card/50 flex items-center justify-center mb-2">

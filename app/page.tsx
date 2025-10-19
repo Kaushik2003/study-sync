@@ -1,5 +1,9 @@
-import { Dashboard } from "@/components/dashboard/dashboard"
+import React from 'react'
 
-export default function Home() {
-  return <Dashboard />
+const page = () => {
+  return (
+    <div>ACED Landing Page</div>
+  )
 }
+
+export default page

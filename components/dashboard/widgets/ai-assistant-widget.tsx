@@ -15,9 +15,10 @@ export function AIAssistantWidget() {
   // Start a new conversation with a prompt
   const handleQuickPrompt = (prompt: string) => {
     const id = startConversation("New Conversation")
+    // @ts-ignore
     setCurrentConversation(id)
     // Navigate to assistant page
-    window.location.href = "/assistant"
+    window.location.href = "/dashboard/assistant"
   }
 
   return (
@@ -46,7 +47,7 @@ export function AIAssistantWidget() {
         </div>
 
         <Button asChild className="w-full mt-auto">
-          <Link href="/assistant">
+          <Link href="/dashboard/assistant">
             <Bot className="h-4 w-4 mr-1" />
             Open Full Chat
             <ChevronRight className="h-4 w-4 ml-auto" />
